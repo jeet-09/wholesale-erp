@@ -62,15 +62,16 @@ export default function ProductsPage() {
       {isError ? <p className="text-sm text-red-600">Could not load products.</p> : null}
 
       <div className="-mx-4 overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm sm:mx-0">
-        <table className="erp-table min-w-[800px] w-full text-left">
+        <table className="erp-table min-w-[920px] w-full text-left">
           <thead>
             <tr>
               <th className="px-4 py-3">Code</th>
               <th className="px-4 py-3">Name</th>
-              <th className="hidden px-4 py-3 sm:table-cell">Category</th>
+              <th className="hidden px-4 py-3 md:table-cell">Category</th>
               <th className="px-4 py-3">Unit</th>
-              <th className="px-4 py-3 text-right">Price</th>
-              <th className="hidden px-4 py-3 text-right sm:table-cell">Stock</th>
+              <th className="px-4 py-3 text-right">Selling</th>
+              <th className="hidden px-4 py-3 text-right sm:table-cell">Purchase</th>
+              <th className="hidden px-4 py-3 text-right md:table-cell">Stock</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -80,10 +81,15 @@ export default function ProductsPage() {
                 <tr key={row.id}>
                   <td className="px-4 py-3 font-mono text-xs text-slate-800">{row.product_code}</td>
                   <td className="px-4 py-3">{row.name}</td>
-                  <td className="hidden px-4 py-3 sm:table-cell">{row.category}</td>
+                  <td className="hidden px-4 py-3 md:table-cell">{row.category}</td>
                   <td className="px-4 py-3">{row.unit}</td>
-                  <td className="px-4 py-3 text-right tabular-nums">{row.default_selling_price}</td>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {row.default_selling_price}
+                  </td>
                   <td className="hidden px-4 py-3 text-right tabular-nums sm:table-cell">
+                    {row.purchase_price ?? "—"}
+                  </td>
+                  <td className="hidden px-4 py-3 text-right tabular-nums md:table-cell">
                     {row.stock_quantity}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -116,7 +122,7 @@ export default function ProductsPage() {
               ))
             ) : (
               <tr>
-                <td className="px-4 py-8 text-center text-slate-600" colSpan={7}>
+                <td className="px-4 py-8 text-center text-slate-600" colSpan={8}>
                   No products yet.
                 </td>
               </tr>

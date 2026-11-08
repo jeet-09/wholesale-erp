@@ -3,9 +3,10 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { login } from "@/services/auth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchCurrentUser, login } from "@/services/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,18 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const { data: currentUser, isLoading: checkingSession } = useQuery({
+    queryKey: ["auth", "me"],
+    queryFn: fetchCurrentUser,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (currentUser) {
+      router.replace("/dashboard");
+    }
+  }, [currentUser, router]);
   const {
     register,
     handleSubmit,
@@ -48,6 +61,14 @@ export default function LoginPage() {
       setError("root", { message });
     },
   });
+
+  if (checkingSession || currentUser) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+        <p className="text-sm text-slate-600">Loading…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
