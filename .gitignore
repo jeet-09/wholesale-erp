@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+vendor/bundle/
+
+# Env
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+
+# Rails
+backend/log/*
+backend/tmp/*
+!backend/log/.keep
+!backend/tmp/.keep
+backend/storage/*
+!backend/storage/.keep
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Credentials
+backend/config/master.key
+backend/config/credentials/*.key

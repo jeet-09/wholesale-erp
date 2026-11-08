@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Force a readable light ERP theme (ignore OS dark mode for body text). */
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    @apply min-h-dvh bg-slate-100 text-slate-900 antialiased;
+  }
+}
+
+@layer components {
+  .erp-table thead th {
+    @apply bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-700;
+  }
+
+  .erp-table tbody td {
+    @apply text-sm font-medium text-slate-900;
+  }
+
+  .erp-table tbody tr {
+    @apply border-t border-slate-200 transition-colors hover:bg-slate-50;
+  }
+}
