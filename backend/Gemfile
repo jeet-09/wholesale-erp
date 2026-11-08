@@ -38,6 +38,7 @@ gem "connection_pool", "~> 2.4"
 gem "redis"
 gem "sidekiq"
 gem "rack-attack"
+gem "csv"
 
 group :development, :test do
   gem "dotenv-rails"

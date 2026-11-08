@@ -25,7 +25,7 @@ export type NavItem = {
 export const mainNav: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Customers", href: "/customers", icon: Users },
-  { title: "Customer Groups", href: "/customer-groups", icon: Building2, disabled: true },
+  { title: "Customer Groups", href: "/customer-groups", icon: Building2 },
   { title: "Products", href: "/products", icon: Package },
   { title: "Daily Orders", href: "/daily-orders", icon: ClipboardList, disabled: true },
   { title: "Order Register", href: "/orders", icon: ListOrdered, disabled: true },

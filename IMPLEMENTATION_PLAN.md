@@ -19,14 +19,20 @@
 |------|--------|
 | DB migrations (customers, groups, products, prices) | Done |
 | Models + validations | Done |
-| List/create APIs | Done |
+| List/create/update/archive/restore APIs | Done |
+| Customer list filters + status | Done |
 | Customer & product list UI | Done |
-| Create/edit forms, import, pricing UI | In progress |
-| Request/model specs | Pending (needs PostgreSQL) |
+| Create/edit forms, CSV import, special pricing UI | Done |
+| Customer groups UI + branches + status | Done |
+| Customer/group/branch pricing + resolve_price | Done |
+| Product price update/remove overrides | Done |
+| Request/model specs | Partial (import + auth — optional polish) |
+
+**Phase 1 complete** — ready to start Phase 2.
 
 ## Phase 2 — Daily orders & matrix
 
-Not started.
+Not started (next major phase).
 
 ## Phase 3 — Invoices
 
@@ -50,4 +56,4 @@ Not started.
 
 ---
 
-*Last updated: Phase 0 in progress.*
+*Last updated: Phase 1 complete.*

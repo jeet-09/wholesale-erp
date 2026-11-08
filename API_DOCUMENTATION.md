@@ -44,10 +44,22 @@ Cookie session (`_wholesale_session`). Frontend must send requests with credenti
 |--------|------|-------------|
 | GET | `/api/v1/health` | API liveness |
 
-## Upcoming (Phase 1+)
+## Phase 1 — Customers & products
 
-- `/api/v1/customers`, `/api/v1/customer_groups`
-- `/api/v1/products`, `/api/v1/products/import`
+| Method | Path | Notes |
+|--------|------|-------|
+| GET/POST | `/api/v1/customers` | List, create |
+| GET/PATCH | `/api/v1/customers/:id` | Show, update |
+| POST | `/api/v1/customers/:id/archive` | Soft archive (inactive) |
+| POST | `/api/v1/customers/:id/restore` | Reactivate archived customer |
+| GET/POST/PATCH | `/api/v1/customer_groups` | Groups + show includes branches |
+| GET/POST/PATCH | `/api/v1/products` | Catalog |
+| GET | `/api/v1/products/import_template` | CSV template download |
+| POST | `/api/v1/products/import` | multipart `file` or `csv` body |
+| GET | `/api/v1/products/:id/resolve_price?customer_id=` | Price resolution |
+| GET/POST/PATCH/DELETE | `/api/v1/product_prices` | Custom pricing (create / update price / remove override) |
+
+## Upcoming (Phase 2+)
 - `/api/v1/orders`, `/api/v1/orders/daily_matrix`
 - `/api/v1/invoices`, `/api/v1/challans`, `/api/v1/payments`
 - `/api/v1/ledger`, `/api/v1/reports/*`

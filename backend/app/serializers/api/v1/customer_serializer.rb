@@ -18,12 +18,15 @@ module Api
           contact_person: @customer.contact_person,
           mobile: @customer.mobile,
           email: @customer.email,
+          billing_address: @customer.billing_address,
+          delivery_address: @customer.delivery_address,
           city: @customer.city,
           state: @customer.state,
           gstin: @customer.gstin,
           opening_balance: @customer.opening_balance.to_s("F"),
           balance_type: @customer.balance_type,
           payment_terms: @customer.payment_terms,
+          notes: @customer.notes,
           active: @customer.active
         }
       end

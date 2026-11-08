@@ -1,11 +1,15 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
-const quickActions = [
-  { label: "Create Customer", href: "/customers", disabled: true },
-  { label: "Add Product", href: "/products", disabled: true },
+type QuickAction = { label: string; href: string; disabled?: boolean };
+
+const quickActions: QuickAction[] = [
+  { label: "Create Customer", href: "/customers" },
+  { label: "Add Product", href: "/products" },
+  { label: "Customer Groups", href: "/customer-groups" },
   { label: "Enter Order", href: "/daily-orders", disabled: true },
-  { label: "Record Payment", href: "/payments", disabled: true },
 ];
 
 export default function DashboardPage() {
@@ -37,11 +41,21 @@ export default function DashboardPage() {
       <section className="mt-8">
         <h3 className="mb-3 text-sm font-semibold text-slate-700">Quick actions</h3>
         <div className="flex flex-wrap gap-2">
-          {quickActions.map((action) => (
-            <Button key={action.label} variant="outline" disabled>
-              {action.label}
-            </Button>
-          ))}
+          {quickActions.map((action) =>
+            action.disabled ? (
+              <Button key={action.label} variant="outline" disabled>
+                {action.label}
+              </Button>
+            ) : (
+              <Link
+                key={action.label}
+                href={action.href}
+                className={cn(buttonVariants({ variant: "outline", size: "default" }))}
+              >
+                {action.label}
+              </Link>
+            )
+          )}
         </div>
       </section>
     </div>

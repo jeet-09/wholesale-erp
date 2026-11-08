@@ -17,6 +17,41 @@ module Api
         render_result(result, success_status: :created)
       end
 
+      def update
+        product = Product.find(params[:id])
+        result = Products::UpdateService.call(product: product, params: product_params)
+        render_result(result)
+      end
+
+      def import_template
+        csv = Products::ImportTemplate.to_csv
+        send_data csv,
+                  filename: "products_import_template.csv",
+                  type: "text/csv",
+                  disposition: "attachment"
+      end
+
+      def import
+        csv_string =
+          if params[:file].present?
+            params[:file].read
+          else
+            params.require(:csv)
+          end
+        result = Products::BulkImportService.call(
+          csv_string: csv_string,
+          update_existing: truthy?(params.fetch(:update_existing, "true"))
+        )
+        render_result(result, success_status: :created)
+      end
+
+      def resolve_price
+        product = Product.find(params[:id])
+        customer = Customer.find(params.require(:customer_id))
+        data = Products::PriceForCustomerQuery.new(product: product, customer: customer).call
+        render json: { success: true, data: data }
+      end
+
       private
 
       def product_params
