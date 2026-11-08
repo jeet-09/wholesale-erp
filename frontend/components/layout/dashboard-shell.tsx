@@ -1,27 +1,27 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { fetchCurrentUser } from "@/services/auth";
+import { isLoggedIn, useAuthSession } from "@/hooks/use-auth-session";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/services/auth";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { data: user, isLoading, isError, refetch } = useQuery({
-    queryKey: ["auth", "me"],
-    queryFn: fetchCurrentUser,
-    retry: false,
-  });
+  const queryClient = useQueryClient();
+  const authQuery = useAuthSession();
+  const { isPending, isError } = authQuery;
+  const user = isLoggedIn(authQuery) ? authQuery.data : null;
 
   useEffect(() => {
-    if (!isLoading && isError) {
+    if (!isPending && isError) {
+      queryClient.removeQueries({ queryKey: ["auth", "me"] });
       router.replace("/login");
     }
-  }, [isLoading, isError, router]);
+  }, [isPending, isError, queryClient, router]);
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="animate-pulse space-y-4">
         <div className="h-8 w-48 rounded bg-slate-200" />
@@ -46,7 +46,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           size="sm"
           onClick={async () => {
             await logout();
-            await refetch();
+            queryClient.removeQueries({ queryKey: ["auth", "me"] });
             router.replace("/login");
           }}
         >
