@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiClientError } from "@/lib/api-client";
+import { TheZoovaLogo } from "@/components/branding/the-zoova-logo";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -62,23 +63,20 @@ export default function LoginPage() {
 
   if (checkingSession || isLoggedIn(authQuery)) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+      <div className="flex min-h-screen items-center justify-center bg-cream">
         <p className="text-sm text-slate-600">Loading…</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-      <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="mb-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
-            Kisan Traders
+    <div className="flex min-h-screen items-center justify-center bg-cream px-4">
+      <div className="w-full max-w-md rounded-xl border border-ink/10 bg-white p-8 shadow-sm">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <TheZoovaLogo className="justify-center" markSize={40} />
+          <p className="mt-3 text-sm text-ink/70">
+            Bulk supply, connected — sign in to continue
           </p>
-          <h1 className="mt-2 text-2xl font-semibold text-slate-900">
-            Wholesale ERP
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">Sign in to continue</p>
         </div>
 
         <form

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchCurrentUser, type AuthUser } from "@/services/auth";
+import { fetchCurrentUser } from "@/services/auth";
 
 /**
  * Shared session check. On 401, React Query may still hold stale user data —
@@ -16,8 +16,6 @@ export function useAuthSession() {
   });
 }
 
-export function isLoggedIn(
-  query: ReturnType<typeof useAuthSession>,
-): query is { data: AuthUser; isSuccess: true; isError: false } {
+export function isLoggedIn(query: ReturnType<typeof useAuthSession>): boolean {
   return query.isSuccess && query.data != null;
 }

@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { Button } from "@/components/ui/button";
+import { TheZoovaLogo } from "@/components/branding/the-zoova-logo";
 
 const STORAGE_KEY = "erp-sidebar-collapsed";
 
@@ -39,7 +40,7 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh w-full bg-slate-100">
       {/* Desktop: full-height collapsible sidebar */}
-      <div className="hidden shrink-0 lg:block">
+      <div className="relative z-20 hidden shrink-0 overflow-visible lg:block">
         <AppSidebar
           className="sticky top-0 h-dvh"
           collapsed={desktopCollapsed}
@@ -90,12 +91,7 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
           >
             <Menu className="h-4 w-4" />
           </Button>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-              Kisan Traders
-            </p>
-            <p className="text-sm font-semibold text-slate-900">Wholesale ERP</p>
-          </div>
+          <TheZoovaLogo markSize={28} />
         </header>
 
         <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">

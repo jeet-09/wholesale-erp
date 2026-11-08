@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { mainNav } from "@/constants/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ReactNode } from "react";
+import { TheZoovaLogo } from "@/components/branding/the-zoova-logo";
 
 type AppSidebarProps = {
   className?: string;
@@ -29,11 +30,29 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "flex flex-col bg-slate-900 text-slate-100 transition-[width] duration-200 ease-in-out",
+        "relative flex flex-col bg-slate-900 text-slate-100 transition-[width] duration-200 ease-in-out",
         collapsed ? "w-[4.75rem]" : "w-64",
         className
       )}
     >
+      {/* Small edge control — sits on the right border of the nav */}
+      {showCollapseControl && onToggleCollapse ? (
+        <button
+          type="button"
+          onClick={onToggleCollapse}
+          className="absolute -right-2.5 top-8 z-20 flex h-5 w-5 items-center justify-center rounded-full border border-slate-600 bg-slate-800 text-slate-300 shadow-sm transition-colors hover:border-slate-400 hover:bg-slate-700 hover:text-white"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-3 w-3" strokeWidth={2.5} />
+          ) : (
+            <ChevronLeft className="h-3 w-3" strokeWidth={2.5} />
+          )}
+        </button>
+      ) : null}
+
       <div
         className={cn(
           "border-b border-slate-800",
@@ -42,23 +61,8 @@ export function AppSidebar({
       >
         {collapsed ? (
           <div className="flex flex-col items-center gap-2">
-            {showCollapseControl && onToggleCollapse ? (
-              <button
-                type="button"
-                onClick={onToggleCollapse}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-200 ring-1 ring-slate-700/80 transition-colors hover:bg-slate-800 hover:text-white"
-                title="Expand sidebar"
-                aria-expanded={false}
-                aria-label="Expand sidebar"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            ) : null}
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-xs font-bold tracking-tight text-white shadow-sm"
-              title="Kisan Traders — Wholesale ERP"
-            >
-              KT
+            <div title="TheZoova" className="flex justify-center">
+              <TheZoovaLogo markOnly markSize={40} />
             </div>
             {headerAction ? (
               <div className="flex w-full justify-center">{headerAction}</div>
@@ -66,25 +70,8 @@ export function AppSidebar({
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            {showCollapseControl && onToggleCollapse ? (
-              <button
-                type="button"
-                onClick={onToggleCollapse}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-200 transition-colors hover:bg-slate-800 hover:text-white"
-                title="Collapse sidebar"
-                aria-expanded
-                aria-label="Collapse sidebar"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-            ) : null}
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
-                Kisan Traders
-              </p>
-              <h1 className="text-lg font-semibold leading-tight text-white">
-                Wholesale ERP
-              </h1>
+              <TheZoovaLogo wordmarkClassName="text-cream" markSize={32} />
             </div>
             {headerAction}
           </div>
