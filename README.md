@@ -1,66 +1,101 @@
-# Vegetable Wholesale Management ERP
+# TheZoova — Wholesale ERP
 
-Production-oriented wholesale ERP for order processing, billing, delivery challans, payments, and customer accounting. Replaces a legacy Windows desktop billing application.
+Wholesale operations app for customers, products, pricing, and (upcoming) daily orders, billing, challans, and payments.
+
+Rails owns all business logic and data. The Next.js UI talks to the API only.
 
 ## Stack
 
 | Layer | Technology |
 |-------|------------|
-| Backend | Ruby on Rails (API-only), PostgreSQL, Redis, Sidekiq |
-| Frontend | Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui |
-| Infra | Docker Compose |
-
-Rails is the single source of truth for business logic and persistence. The frontend communicates only via REST APIs.
+| Backend | Ruby on Rails 8.1 (API-only), PostgreSQL, Redis, Sidekiq |
+| Frontend | Next.js 15 (App Router), TypeScript, Tailwind CSS |
+| Infra | Docker Compose (optional) |
 
 ## Repository layout
 
 ```
-├── backend/          # Rails API
-├── frontend/         # Next.js application
-├── docker-compose.yml
-└── docs/             # Architecture and design notes (root-level *.md)
+├── backend/                 # Rails API
+│   ├── db/seeds.rb          # Core seed (admin, categories, units)
+│   └── db/seeds/demo_data.rb # Demo customers, products, prices
+├── frontend/                # Next.js app
+├── scripts/dev-services.sh  # Start Homebrew Postgres + Redis
+├── docker-compose.yml       # Optional all-in-one containers
+└── *.md                     # Architecture and design docs
 ```
 
-## Quick start (local)
+## URLs (local)
 
-### Prerequisites
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3001 |
+| Backend API | http://localhost:3000 |
 
-- Ruby **3.4.3** (Rails 8.1), Bundler
-- Node.js 20+
-- PostgreSQL 16+ and Redis 7+ (Homebrew or Docker)
-- Docker (optional)
+---
 
-**Local databases (Homebrew):**
+## Prerequisites (install once)
+
+Required for the **recommended path** (no Docker):
+
+| Tool | Version | Notes |
+|------|---------|--------|
+| Ruby | **3.4.3** | Rails 8.1 — use rbenv/rvm/asdf |
+| Bundler | latest | `gem install bundler` |
+| Node.js | **20+** | includes npm |
+| PostgreSQL | **16+** | Homebrew: `brew install postgresql@16` |
+| Redis | **7+** | Homebrew: `brew install redis` |
+
+Optional: **Docker Desktop** if you prefer containers instead of local Postgres/Redis/Ruby/Node.
+
+---
+
+## Recommended setup (without Docker)
+
+This is the path used for day-to-day development on macOS.
+
+### 1. Start Postgres and Redis
 
 ```bash
-./scripts/dev-services.sh   # postgres@16 + redis
+./scripts/dev-services.sh
+# or:
+# brew services start postgresql@16
+# brew services start redis
 ```
 
-Copy `backend/.env.example` to `backend/.env`. For Homebrew Postgres use your **macOS username** as `DATABASE_USER` and leave `DATABASE_PASSWORD` empty. For Docker use `postgres` / `postgres`.
-
-### With Docker Compose
+Check:
 
 ```bash
-docker compose up --build
+# Postgres
+pg_isready -h localhost
+
+# Redis
+redis-cli ping   # should print PONG
 ```
 
-- API: http://localhost:3000
-- Frontend: http://localhost:3001
-- Default admin (development seeds): see `backend/db/seeds.rb`
-
-### Without Docker
-
-**Backend**
+### 2. Backend (Rails + database)
 
 ```bash
 cd backend
 cp .env.example .env
+```
+
+Edit `backend/.env`:
+
+- Set `DATABASE_USER` to your **macOS username** (Homebrew Postgres).
+- Leave `DATABASE_PASSWORD` empty for typical local Homebrew installs.
+- Keep `SEED_DEMO_DATA=true` to load demo customers/products (recommended).
+
+```bash
 bundle install
-rails db:create db:migrate db:seed
+bin/rails db:create db:migrate db:seed
 bin/rails server -p 3000
 ```
 
-**Frontend**
+Leave this terminal running. API: http://localhost:3000
+
+### 3. Frontend (Next.js)
+
+Open a **second** terminal:
 
 ```bash
 cd frontend
@@ -69,36 +104,239 @@ npm install
 npm run dev
 ```
 
-Set `NEXT_PUBLIC_API_URL=http://localhost:3000` in `frontend/.env.local`.
-
-**Random `ENOENT` / `build-manifest.json` errors?** Stop all dev servers, then `cd frontend && npm run dev:clean`. See [frontend/TROUBLESHOOTING.md](./frontend/TROUBLESHOOTING.md).
-
-### Demo / test data
+`.env.local` should contain:
 
 ```bash
-cd backend && bundle exec rails db:seed
+NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
-Creates an admin user, product categories, **7 customers** (3 individuals + 4 franchise branches), **20 sample products**, and sample customer/group pricing. Set `SEED_DEMO_DATA=false` in `.env` to skip demo rows.
+App: http://localhost:3001
 
-| Login | Email | Password (default) |
-|-------|--------|-------------------|
+### 4. Log in
+
+| Role | Email | Password |
+|------|--------|----------|
 | Admin | `admin@kisantraders.local` | `ChangeMe123!` |
 | Staff | `staff@kisantraders.local` | `ChangeMe123!` |
 
-View lists in the app: **Customers** and **Products** after login on http://localhost:3001.
+Passwords come from `SEED_ADMIN_PASSWORD` / `SEED_STAFF_PASSWORD` in `backend/.env` (defaults above).
+
+---
+
+## Seed data
+
+Seeds are **idempotent** (safe to re-run). They use find-or-create by stable codes/emails.
+
+### Seed files
+
+| File | Purpose |
+|------|---------|
+| `backend/db/seeds.rb` | Admin user, product categories, product units; then loads demo data |
+| `backend/db/seeds/demo_data.rb` | Staff user, customer group + branches, individual customers, sample products, special prices |
+
+### What gets created (`SEED_DEMO_DATA=true`)
+
+- Admin + staff users  
+- Product categories and units  
+- Butterfly Hospitality group + 4 branches  
+- Individual customers (e.g. Amar Kitchen, etc.)  
+- ~20 sample products  
+- Sample customer/group pricing overrides  
+
+### Seed commands
+
+**Full seed** (after DB exists):
+
+```bash
+cd backend
+bin/rails db:seed
+```
+
+**Create DB + migrate + seed** (first time):
+
+```bash
+cd backend
+bin/rails db:create db:migrate db:seed
+```
+
+**Wipe database and seed from scratch** (destroys all data):
+
+```bash
+cd backend
+bin/rails db:reset
+# same as: drop + create + migrate + seed
+```
+
+**Seed without demo customers/products** (admin + categories/units only):
+
+```bash
+cd backend
+# either set SEED_DEMO_DATA=false in .env, or:
+SEED_DEMO_DATA=false bin/rails db:seed
+```
+
+---
+
+## Daily development (after first setup)
+
+1. Ensure Postgres + Redis are running (`./scripts/dev-services.sh`).  
+2. Terminal 1 — API:
+
+```bash
+cd backend && bin/rails server -p 3000
+```
+
+3. Terminal 2 — UI:
+
+```bash
+cd frontend && npm run dev
+```
+
+4. Open http://localhost:3001 and sign in.
+
+---
+
+## Setup with Docker
+
+Use this if you do **not** want to install Ruby, Node, Postgres, or Redis on your machine. Everything runs in containers.
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and **running**
+- Ports **3000**, **3001**, **5432**, and **6379** free on your machine
+
+### 1. Start all services
+
+From the **project root** (where `docker-compose.yml` lives):
+
+```bash
+docker compose up --build
+```
+
+First run builds images (can take a few minutes). Later runs are faster.
+
+Services started:
+
+| Service | Role | Host URL |
+|---------|------|----------|
+| `postgres` | Database | localhost:5432 |
+| `redis` | Cache / Sidekiq | localhost:6379 |
+| `backend` | Rails API | http://localhost:3000 |
+| `sidekiq` | Background jobs | — |
+| `frontend` | Next.js UI | http://localhost:3001 |
+
+Compose sets DB credentials for you (`DATABASE_USER=postgres`, `DATABASE_PASSWORD=postgres`). You do **not** need to copy `backend/.env` for Docker.
+
+### 2. Create database, migrate, and seed
+
+In a **second** terminal (while compose is still running):
+
+```bash
+# Create DB + run migrations (first time or after new migrations)
+docker compose exec backend bin/rails db:prepare
+
+# Load admin, categories, demo customers/products/prices
+docker compose exec backend bin/rails db:seed
+```
+
+**Wipe Docker DB and re-seed from scratch:**
+
+```bash
+docker compose exec backend bin/rails db:reset
+```
+
+**Seed without demo customers/products:**
+
+```bash
+docker compose exec -e SEED_DEMO_DATA=false backend bin/rails db:seed
+```
+
+### 3. Open the app and log in
+
+1. Open http://localhost:3001  
+2. Sign in:
+
+| Role | Email | Password |
+|------|--------|----------|
+| Admin | `admin@kisantraders.local` | `ChangeMe123!` |
+| Staff | `staff@kisantraders.local` | `ChangeMe123!` |
+
+### 4. Useful Docker commands
+
+```bash
+# Start in background (detached)
+docker compose up --build -d
+
+# Follow logs
+docker compose logs -f
+
+# Logs for one service
+docker compose logs -f backend
+docker compose logs -f frontend
+
+# Stop containers (keeps database volume)
+docker compose down
+
+# Stop and delete database volume (full reset)
+docker compose down -v
+
+# Re-seed after containers are up
+docker compose exec backend bin/rails db:seed
+
+# Open a Rails console inside the container
+docker compose exec backend bin/rails console
+```
+
+### 5. Daily use with Docker
+
+```bash
+# From project root
+docker compose up
+# then (if DB not seeded yet):
+docker compose exec backend bin/rails db:prepare db:seed
+```
+
+Open http://localhost:3001 when the frontend is ready.
+
+> **Note:** If you already run Homebrew Postgres/Redis on the same ports, stop them first (`brew services stop postgresql@16 redis`) or change ports in `docker-compose.yml` to avoid conflicts.
+
+---
+
+## Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| `EADDRINUSE` on port 3001 | Find PID: `lsof -i :3001` then `kill <PID>` |
+| Next.js `ENOENT` / `build-manifest.json` | Stop servers, then `cd frontend && npm run dev:clean` |
+| Postgres connection refused | Without Docker: `./scripts/dev-services.sh`. With Docker: `docker compose up` and wait for healthy postgres |
+| Port 5432 already in use | Stop Homebrew Postgres, or stop other Docker Postgres |
+| Wrong DB user | Without Docker → macOS username; Docker → `postgres` / `postgres` |
+| No customers after Docker start | `docker compose exec backend bin/rails db:prepare db:seed` |
+| Stuck on login after logout | Hard refresh; ensure API is on port 3000 |
+
+More frontend notes: [frontend/TROUBLESHOOTING.md](./frontend/TROUBLESHOOTING.md)
+
+---
 
 ## Documentation
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — system design and patterns
-- [DATABASE_DESIGN.md](./DATABASE_DESIGN.md) — schema overview
-- [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) — REST API reference
-- [DEVELOPMENT_GUIDELINES.md](./DEVELOPMENT_GUIDELINES.md) — coding standards
-- [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) — phased delivery status
+| Doc | Contents |
+|-----|----------|
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | System design and layers |
+| [DATABASE_DESIGN.md](./DATABASE_DESIGN.md) | Schema overview |
+| [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) | REST API reference |
+| [DEVELOPMENT_GUIDELINES.md](./DEVELOPMENT_GUIDELINES.md) | Coding standards |
+| [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Phase status (Phase 1 done; Phase 2 next) |
 
-## Implementation phases
+---
 
-See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for current phase and checklist.
+## Implementation status
+
+- **Phase 0** — Foundation, auth, shell — Done  
+- **Phase 1** — Customers, groups, products, CSV import, special pricing — Done  
+- **Phase 2** — Daily orders & matrix — Not started  
+
+Details: [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)
 
 ## License
 
