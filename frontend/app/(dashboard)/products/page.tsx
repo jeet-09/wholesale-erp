@@ -32,12 +32,12 @@ export default function ProductsPage() {
   return (
     <div>
       <PageHeader
-        title="Products"
-        description="Catalogue, CSV import, and customer-specific pricing."
+        title="Items"
+        description="Item master (EzzyBilling Items) — Item Type, Item Unit, Stock, Net Loss, pricing."
         actions={
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
             <Input
-              placeholder="Search…"
+              placeholder="Find Items…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full sm:w-52"
@@ -52,26 +52,26 @@ export default function ProductsPage() {
                 setFormOpen(true);
               }}
             >
-              New product
+              New Item
             </Button>
           </div>
         }
       />
 
-      {isLoading ? <p className="text-sm text-slate-600">Loading products…</p> : null}
-      {isError ? <p className="text-sm text-red-600">Could not load products.</p> : null}
+      {isLoading ? <p className="text-sm text-slate-600">Loading items…</p> : null}
+      {isError ? <p className="text-sm text-red-600">Could not load items.</p> : null}
 
       <div className="-mx-4 overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm sm:mx-0">
-        <table className="erp-table min-w-[920px] w-full text-left">
+        <table className="erp-table min-w-[960px] w-full text-left">
           <thead>
             <tr>
-              <th className="px-4 py-3">Code</th>
-              <th className="px-4 py-3">Name</th>
-              <th className="hidden px-4 py-3 md:table-cell">Category</th>
-              <th className="px-4 py-3">Unit</th>
-              <th className="px-4 py-3 text-right">Selling</th>
+              <th className="px-4 py-3">Item code</th>
+              <th className="px-4 py-3">Item Name</th>
+              <th className="hidden px-4 py-3 md:table-cell">Item Type</th>
+              <th className="px-4 py-3">Item Unit</th>
+              <th className="px-4 py-3 text-right">Price</th>
               <th className="hidden px-4 py-3 text-right sm:table-cell">Purchase</th>
-              <th className="hidden px-4 py-3 text-right md:table-cell">Stock</th>
+              <th className="hidden px-4 py-3 text-right md:table-cell">Stock Balance</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -123,7 +123,7 @@ export default function ProductsPage() {
             ) : (
               <tr>
                 <td className="px-4 py-8 text-center text-slate-600" colSpan={8}>
-                  No products yet.
+                  No items yet.
                 </td>
               </tr>
             )}

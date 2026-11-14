@@ -327,6 +327,7 @@ More frontend notes: [frontend/TROUBLESHOOTING.md](./frontend/TROUBLESHOOTING.md
 | [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) | REST API reference |
 | [DEVELOPMENT_GUIDELINES.md](./DEVELOPMENT_GUIDELINES.md) | Coding standards |
 | [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Phase status (Phase 1 done; Phase 2 next) |
+| [LEGACY_FIELD_MAPPING.md](./LEGACY_FIELD_MAPPING.md) | EzzyBilling ↔ TheZoova field names |
 
 ---
 

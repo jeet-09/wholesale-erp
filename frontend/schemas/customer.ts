@@ -3,9 +3,10 @@ import { z } from "zod";
 export const customerSchema = z.object({
   customer_type: z.enum(["individual", "branch"]),
   customer_group_id: z.number().optional().nullable(),
-  restaurant_name: z.string().min(1, "Restaurant name is required"),
-  account_name: z.string().min(1, "Account name is required"),
-  customer_code: z.string().min(1, "Customer code is required"),
+  // Kitchen name — may be blank in UI; filled from Name on save if empty
+  restaurant_name: z.string(),
+  account_name: z.string().min(1, "Name is required"),
+  customer_code: z.string().min(1, "Code is required"),
   abbreviation: z.string().min(1, "Abbreviation is required"),
   contact_person: z.string().optional(),
   mobile: z.string().optional(),

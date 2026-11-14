@@ -52,8 +52,8 @@ export default function CustomersPage() {
   return (
     <div>
       <PageHeader
-        title="Customers"
-        description="Restaurants and franchise branches. Filter by any column or archive inactive accounts."
+        title="Accounts"
+        description="Client accounts (EzzyBilling Accounts). Main Group, Abbreviation, Opening Balance."
         actions={
           <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
             <CustomerListFiltersMenu
@@ -68,25 +68,25 @@ export default function CustomersPage() {
                 setDialogOpen(true);
               }}
             >
-              New customer
+              New Account
             </Button>
           </div>
         }
       />
 
-      {isLoading ? <p className="text-sm text-slate-600">Loading customers…</p> : null}
-      {isError ? <p className="text-sm text-red-600">Could not load customers.</p> : null}
+      {isLoading ? <p className="text-sm text-slate-600">Loading accounts…</p> : null}
+      {isError ? <p className="text-sm text-red-600">Could not load accounts.</p> : null}
 
       <div className="-mx-4 overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm sm:mx-0">
-        <table className="erp-table min-w-[880px] w-full text-left">
+        <table className="erp-table min-w-[960px] w-full text-left">
           <thead>
             <tr>
               <th className="px-4 py-3">Code</th>
-              <th className="px-4 py-3">Abbrev</th>
-              <th className="px-4 py-3">Account</th>
-              <th className="px-4 py-3">Type</th>
-              <th className="hidden px-4 py-3 md:table-cell">Group</th>
-              <th className="px-4 py-3">City</th>
+              <th className="px-4 py-3">Abbreviation</th>
+              <th className="px-4 py-3">Account Name</th>
+              <th className="hidden px-4 py-3 md:table-cell">Main Group</th>
+              <th className="px-4 py-3 text-right">Op Balance</th>
+              <th className="px-4 py-3">Balance Type</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
@@ -103,11 +103,15 @@ export default function CustomersPage() {
                   </td>
                   <td className="px-4 py-3 font-mono text-xs">{row.abbreviation}</td>
                   <td className="px-4 py-3">{row.account_name}</td>
-                  <td className="px-4 py-3 capitalize">{row.customer_type}</td>
                   <td className="hidden px-4 py-3 md:table-cell">
                     {row.customer_group_name ?? "—"}
                   </td>
-                  <td className="px-4 py-3">{row.city ?? "—"}</td>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {row.opening_balance}
+                  </td>
+                  <td className="px-4 py-3">
+                    {row.balance_type === "credit" ? "Cr." : "Dr."}
+                  </td>
                   <td className="px-4 py-3">
                     <StatusBadge active={row.active} />
                   </td>
@@ -166,7 +170,7 @@ export default function CustomersPage() {
             ) : (
               <tr>
                 <td className="px-4 py-8 text-center text-slate-600" colSpan={8}>
-                  No customers match your filters.
+                  No accounts match your filters.
                 </td>
               </tr>
             )}

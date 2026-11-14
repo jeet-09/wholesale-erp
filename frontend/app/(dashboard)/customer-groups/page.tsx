@@ -54,11 +54,11 @@ export default function CustomerGroupsPage() {
   return (
     <div>
       <PageHeader
-        title="Customer groups"
-        description="Franchise / group accounts with multiple branches."
+        title="Main Groups"
+        description="Franchise Main Groups (EzzyBilling) — e.g. BF for Butterfly branches."
         actions={
           <Button type="button" onClick={() => setGroupDialog(true)}>
-            New group
+            New Main Group
           </Button>
         }
       />
@@ -123,7 +123,7 @@ export default function CustomerGroupsPage() {
       <Dialog
         open={groupDialog}
         onOpenChange={setGroupDialog}
-        title="New customer group"
+        title="New Main Group"
       >
         <div className="space-y-3">
           <Field label="Group name">
@@ -148,7 +148,7 @@ export default function CustomerGroupsPage() {
               disabled={createMutation.isPending || !name || !code}
               onClick={() => createMutation.mutate()}
             >
-              Create group
+              Add Record
             </Button>
           </div>
         </div>

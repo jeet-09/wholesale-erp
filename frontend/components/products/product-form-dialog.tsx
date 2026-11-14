@@ -48,6 +48,8 @@ const defaults: ProductFormValues = {
   purchase_price: 0,
   stock_quantity: 0,
   net_loss_percentage: 0,
+  tax_category: "",
+  description: "",
 };
 
 export function ProductFormDialog({ open, onOpenChange, product }: Props) {
@@ -108,7 +110,8 @@ export function ProductFormDialog({ open, onOpenChange, product }: Props) {
     <Dialog
       open={open}
       onOpenChange={onOpenChange}
-      title={isEdit ? "Edit product" : "New product"}
+      title={isEdit ? "Update Item" : "New Item"}
+      description="Same fields as EzzyBilling Items — Item's Name, Item Type, Item Unit, Stock, Net Loss."
       className="sm:max-w-2xl"
     >
       <form
@@ -116,8 +119,15 @@ export function ProductFormDialog({ open, onOpenChange, product }: Props) {
         onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
       >
         <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2 sm:col-span-2">
+            <Label>Item&apos;s Name *</Label>
+            <Input {...form.register("name")} placeholder="e.g. Tomato Big" />
+            {form.formState.errors.name ? (
+              <p className="text-xs text-red-600">{form.formState.errors.name.message}</p>
+            ) : null}
+          </div>
           <div className="space-y-2">
-            <Label>Category</Label>
+            <Label>Item Type *</Label>
             <Select
               {...form.register("product_category_id", {
                 setValueAs: (v) => Number(v),
@@ -132,7 +142,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: Props) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Unit</Label>
+            <Label>Item Unit *</Label>
             <Select
               {...form.register("product_unit_id", {
                 setValueAs: (v) => Number(v),
@@ -141,21 +151,41 @@ export function ProductFormDialog({ open, onOpenChange, product }: Props) {
               <option value={0}>Select…</option>
               {units?.map((u) => (
                 <option key={u.id} value={u.id}>
-                  {u.name}
+                  {u.name} ({u.abbreviation})
                 </option>
               ))}
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Product code</Label>
-            <Input {...form.register("product_code")} disabled={isEdit} className="font-mono uppercase" />
+            <Label>Item code</Label>
+            <Input
+              {...form.register("product_code")}
+              disabled={isEdit}
+              className="font-mono uppercase"
+            />
           </div>
           <div className="space-y-2">
-            <Label>Name</Label>
-            <Input {...form.register("name")} />
+            <Label>Stock</Label>
+            <Input
+              type="number"
+              step="0.001"
+              {...form.register("stock_quantity", { valueAsNumber: true })}
+            />
           </div>
           <div className="space-y-2">
-            <Label>Selling price</Label>
+            <Label>Net Loss (%)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              {...form.register("net_loss_percentage", { valueAsNumber: true })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Tax Deduct</Label>
+            <Input {...form.register("tax_category")} placeholder="Tax category" />
+          </div>
+          <div className="space-y-2">
+            <Label>Price (selling)</Label>
             <Input
               type="number"
               step="0.01"
@@ -170,14 +200,6 @@ export function ProductFormDialog({ open, onOpenChange, product }: Props) {
               {...form.register("purchase_price", { valueAsNumber: true })}
             />
           </div>
-          <div className="space-y-2">
-            <Label>Stock qty</Label>
-            <Input
-              type="number"
-              step="0.001"
-              {...form.register("stock_quantity", { valueAsNumber: true })}
-            />
-          </div>
         </div>
         <div className="space-y-2">
           <Label>Description</Label>
@@ -188,10 +210,14 @@ export function ProductFormDialog({ open, onOpenChange, product }: Props) {
         ) : null}
         <div className="flex justify-end gap-2 border-t pt-4">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Clear / Cancel
           </Button>
           <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? "Saving…" : isEdit ? "Save" : "Create product"}
+            {mutation.isPending
+              ? "Saving…"
+              : isEdit
+                ? "Update Record"
+                : "Add Record"}
           </Button>
         </div>
       </form>

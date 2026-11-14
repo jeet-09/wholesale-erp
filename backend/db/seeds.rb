@@ -10,20 +10,35 @@ admin.save!
 
 Rails.logger.info "Seeded admin user: #{admin.email}"
 
+# Item Type labels match EzzyBilling: Indian, Exotic, Fruits, Imported, Others
 categories = [
-  ["Indian vegetables", "indian-vegetables"],
-  ["Exotic vegetables", "exotic-vegetables"],
+  ["Indian", "indian-vegetables"],
+  ["Exotic", "exotic-vegetables"],
   ["Fruits", "fruits"],
-  ["Imported products", "imported-products"],
+  ["Imported", "imported-products"],
   ["Others", "others"]
 ]
 categories.each_with_index do |(name, slug), index|
-  ProductCategory.find_or_create_by!(slug: slug) { |c| c.name = name; c.position = index }
+  cat = ProductCategory.find_or_initialize_by(slug: slug)
+  cat.name = name
+  cat.position = index
+  cat.active = true if cat.new_record?
+  cat.save!
 end
 
-%w[Kg Gram Piece Box Packet Bunch Dozen Litre].each do |unit_name|
+# Item Unit — names/abbreviations familiar from EzzyBilling (Kg., pkg., no., box)
+[
+  ["Kg", "Kg."],
+  ["Gram", "g"],
+  ["Piece", "no."],
+  ["Box", "box"],
+  ["Packet", "pkg."],
+  ["Bunch", "Bndl"],
+  ["Dozen", "Doz"],
+  ["Litre", "L"]
+].each do |unit_name, abbrev|
   ProductUnit.find_or_create_by!(name: unit_name) do |u|
-    u.abbreviation = unit_name == "Kg" ? "kg" : unit_name.downcase[0..2]
+    u.abbreviation = abbrev
   end
 end
 

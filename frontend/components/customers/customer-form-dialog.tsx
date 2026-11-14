@@ -86,12 +86,17 @@ export function CustomerFormDialog({
   });
 
   const customerType = form.watch("customer_type");
+  const balanceType = form.watch("balance_type");
 
   const mutation = useMutation({
     mutationFn: (values: CustomerFormValues) => {
+      // Keep kitchen name in sync with account name when left blank.
+      const restaurant =
+        values.restaurant_name?.trim() || values.account_name;
       const payload = {
         customer: {
           ...values,
+          restaurant_name: restaurant,
           email: values.email || undefined,
           customer_group_id:
             values.customer_type === "branch" ? values.customer_group_id : null,
@@ -119,8 +124,8 @@ export function CustomerFormDialog({
     <Dialog
       open={open}
       onOpenChange={onOpenChange}
-      title={isEdit ? "Edit customer" : "New customer"}
-      description="Individual restaurant or franchise branch. Codes must be unique."
+      title={isEdit ? "Update Account" : "New Account"}
+      description="Same fields as EzzyBilling Accounts — Name, Main Group, Abbreviation, Opening Balance."
       className="sm:max-w-2xl"
     >
       <form
@@ -128,72 +133,100 @@ export function CustomerFormDialog({
         onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
       >
         <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Name *" error={form.formState.errors.account_name?.message}>
+            <Input {...form.register("account_name")} placeholder="Account name" />
+          </Field>
+          <Field label="Main Group">
+            <Select
+              {...form.register("customer_group_id", {
+                setValueAs: (v) => (v === "" ? null : Number(v)),
+              })}
+            >
+              <option value="">— None —</option>
+              {groups?.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.abbreviation || g.code} — {g.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Abbreviation *" error={form.formState.errors.abbreviation?.message}>
+            <Input
+              {...form.register("abbreviation")}
+              className="font-mono uppercase"
+              placeholder="e.g. BF, AMK"
+            />
+          </Field>
+          <Field label="Code *" error={form.formState.errors.customer_code?.message}>
+            <Input
+              {...form.register("customer_code")}
+              disabled={isEdit}
+              className="font-mono uppercase"
+            />
+          </Field>
+          <Field label="Mob No">
+            <Input {...form.register("mobile")} placeholder="Mobile number" />
+          </Field>
           <div className="space-y-2">
-            <Label>Type</Label>
+            <Label>Account type</Label>
             <Select {...form.register("customer_type")} disabled={isEdit}>
-              <option value="individual">Individual restaurant</option>
-              <option value="branch">Franchise branch</option>
+              <option value="individual">Individual (single account)</option>
+              <option value="branch">Branch (under Main Group)</option>
             </Select>
           </div>
-          {customerType === "branch" ? (
-            <div className="space-y-2">
-              <Label>Customer group</Label>
-              <Select
-                {...form.register("customer_group_id", {
-                  setValueAs: (v) => (v === "" ? null : Number(v)),
-                })}
-              >
-                <option value="">Select group…</option>
-                {groups?.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </Select>
-            </div>
+          {customerType === "branch" && !form.watch("customer_group_id") ? (
+            <p className="text-xs text-amber-700 sm:col-span-2">
+              Branch accounts should select a Main Group (required).
+            </p>
           ) : null}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Restaurant name" error={form.formState.errors.restaurant_name?.message}>
-            <Input {...form.register("restaurant_name")} />
-          </Field>
-          <Field label="Account name" error={form.formState.errors.account_name?.message}>
-            <Input {...form.register("account_name")} />
-          </Field>
-          <Field label="Customer code" error={form.formState.errors.customer_code?.message}>
-            <Input {...form.register("customer_code")} disabled={isEdit} className="font-mono uppercase" />
-          </Field>
-          <Field label="Abbreviation (matrix)" error={form.formState.errors.abbreviation?.message}>
-            <Input {...form.register("abbreviation")} className="font-mono uppercase" />
-          </Field>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Mobile">
-            <Input {...form.register("mobile")} />
-          </Field>
-          <Field label="Email">
-            <Input type="email" {...form.register("email")} />
-          </Field>
-          <Field label="City">
-            <Input {...form.register("city")} />
-          </Field>
-          <Field label="Opening balance">
+          <Field label="Opening Balance">
             <Input
               type="number"
               step="0.01"
               {...form.register("opening_balance", { valueAsNumber: true })}
             />
           </Field>
+          <div className="space-y-2">
+            <Label>Balance type</Label>
+            <div className="flex h-10 items-center gap-4 rounded-md border border-slate-300 px-3">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  value="debit"
+                  checked={balanceType === "debit"}
+                  onChange={() => form.setValue("balance_type", "debit")}
+                />
+                Debit (Dr.)
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  value="credit"
+                  checked={balanceType === "credit"}
+                  onChange={() => form.setValue("balance_type", "credit")}
+                />
+                Credit (Cr.)
+              </label>
+            </div>
+          </div>
         </div>
+
+        <Field label="Kitchen / restaurant name">
+          <Input
+            {...form.register("restaurant_name")}
+            placeholder="Defaults to Name if left blank"
+          />
+        </Field>
+
+        <Field label="Description">
+          <Textarea rows={2} {...form.register("notes")} />
+        </Field>
 
         <Field label="Billing address">
           <Textarea rows={2} {...form.register("billing_address")} />
-        </Field>
-
-        <Field label="Notes">
-          <Textarea rows={2} {...form.register("notes")} />
         </Field>
 
         {form.formState.errors.root ? (
@@ -202,10 +235,14 @@ export function CustomerFormDialog({
 
         <div className="flex justify-end gap-2 border-t border-slate-200 pt-4">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Clear / Cancel
           </Button>
           <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? "Saving…" : isEdit ? "Save changes" : "Create customer"}
+            {mutation.isPending
+              ? "Saving…"
+              : isEdit
+                ? "Update Record"
+                : "Add Record"}
           </Button>
         </div>
       </form>

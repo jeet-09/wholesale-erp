@@ -221,11 +221,11 @@ export function CustomerListFiltersMenu({ applied, onApply, groups }: Props) {
                 maxHeight: placement.maxHeight,
               }}
               role="dialog"
-              aria-label="Customer filters"
+              aria-label="Account filters"
             >
               <div className="flex h-full max-h-[inherit] flex-col p-5 sm:p-6">
                 <p className="shrink-0 pb-1 text-sm font-semibold text-slate-800">
-                  Filter customers
+                  Filter accounts
                 </p>
                 <div className="min-h-0 flex-1 space-y-3.5 overflow-x-hidden overflow-y-auto overscroll-contain px-0.5 py-3">
                   <FilterField label="Code">
@@ -236,23 +236,23 @@ export function CustomerListFiltersMenu({ applied, onApply, groups }: Props) {
                       className={cn("h-9 font-mono text-xs", FILTER_FIELD_FOCUS)}
                     />
                   </FilterField>
-                  <FilterField label="Abbrev">
+                  <FilterField label="Abbreviation">
                     <Input
-                      placeholder="Abbrev"
+                      placeholder="e.g. BF, AMK"
                       value={draft.abbreviation ?? ""}
                       onChange={(e) => set("abbreviation", e.target.value)}
                       className={cn("h-9 font-mono text-xs", FILTER_FIELD_FOCUS)}
                     />
                   </FilterField>
-                  <FilterField label="Account">
+                  <FilterField label="Account Name">
                     <Input
-                      placeholder="Account name"
+                      placeholder="Account Name"
                       value={draft.account_name ?? ""}
                       onChange={(e) => set("account_name", e.target.value)}
                       className={cn("h-9", FILTER_FIELD_FOCUS)}
                     />
                   </FilterField>
-                  <FilterField label="Type">
+                  <FilterField label="Account type">
                     <Select
                       value={draft.customer_type ?? ""}
                       onChange={(e) => set("customer_type", e.target.value)}
@@ -263,13 +263,13 @@ export function CustomerListFiltersMenu({ applied, onApply, groups }: Props) {
                       <option value="branch">Branch</option>
                     </Select>
                   </FilterField>
-                  <FilterField label="Group">
+                  <FilterField label="Main Group">
                     <Select
                       value={draft.customer_group_id ?? ""}
                       onChange={(e) => set("customer_group_id", e.target.value)}
                       className={cn("h-9", FILTER_FIELD_FOCUS)}
                     >
-                      <option value="">All groups</option>
+                      <option value="">All Main Groups</option>
                       {groups?.map((g) => (
                         <option key={g.id} value={g.id}>
                           {g.name}
